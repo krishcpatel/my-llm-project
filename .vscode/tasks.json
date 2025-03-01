@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Go App",
+            "type": "shell",
+            "command": "go build -o my-llm-app.exe ./cmd/web",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Go App",
+            "type": "shell",
+            "command": "./my-llm-app.exe",
+            "dependsOn": "Build Go App",
+            "problemMatcher": [
+                "$go"
+            ]
+        }
+    ]
+  }
