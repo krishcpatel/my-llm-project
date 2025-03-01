@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Multi-Turn Chatbot Demo</title>
+  <title>Multi-Turn Chat with DB Memory</title>
   <style>
     body {
       font-family: sans-serif;
@@ -22,23 +22,24 @@
     .botMsg {
       color: green;
     }
+    /* Style any <think> elements in bot messages */
+    think {
+      background-color: yellow;
+      padding: 2px;
+    }
   </style>
 </head>
 <body>
   <h1>Multi-Turn Chat with Memory</h1>
-
   <div id="chatArea"></div>
-
   <div style="margin-top: 20px;">
     <input type="text" id="userInput" size="80" placeholder="Type your message..." />
     <button id="sendBtn">Send</button>
   </div>
-
   <script>
-    // We'll store the entire conversation in this array.
+    // We'll store the conversation in this array.
     // Each element is { role: "user"|"assistant", content: "text" }
     let conversation = [];
-
     const chatArea = document.getElementById('chatArea');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
@@ -48,45 +49,31 @@
       if (!text) return;
       userInput.value = "";
 
-      // 1) Add the user message to conversation
+      // 1) Add the user message to conversation and update UI
       conversation.push({ role: "user", content: text });
-      // 2) Update the UI immediately
       appendMessage("user", text);
 
-      // 3) Create SSE to server, passing the entire conversation
+      // 2) Start SSE request passing the entire conversation as JSON.
       startChatRequest(conversation);
     });
 
     function startChatRequest(conv) {
-      // We'll POST the entire conversation as JSON to /chat/stream
-      // so the server can build the prompt from the conversation.
-      // However, SSE typically uses GET. We'll do a trick: We'll do a fetch POST to start the request,
-      // or we can convert conversation to a query param. But let's keep it simple with JSON in a POST
-      // and then the server can upgrade to SSE if desired. Alternatively, we can do a standard GET with
-      // encoded JSON in the URL. For demonstration, we'll keep GET but not recommended for large conv.
-
-      // We'll encode the entire conversation in a query param (very naive):
+      // Encode the conversation as JSON for the query parameter.
       const convJSON = encodeURIComponent(JSON.stringify(conv));
-      const url = "/chat/stream?conv=" + convJSON;
-
+      // Use a fixed conversation_id (e.g., "2") for demonstration.
+      const url = `/chat/stream?conversation_id=2&conv=${convJSON}`;
       const eventSource = new EventSource(url);
 
-      // As partial text arrives, append it to the last bot message (or create one if none)
       let botMessageBuffer = "";
-
       eventSource.onmessage = (event) => {
-        // Build up the response chunk by chunk
         botMessageBuffer += event.data;
-        // Either show partial tokens or wait until done. For demonstration,
-        // let's show partial tokens in real-time:
         updateBotMessage(botMessageBuffer);
       };
 
       eventSource.addEventListener("done", () => {
-        // The server signaled it's done. Close SSE.
+        console.log("Done event received. Closing SSE.");
         eventSource.close();
-
-        // 4) Add final bot response to conversation array
+        // Add final bot response to conversation array.
         conversation.push({ role: "assistant", content: botMessageBuffer });
       });
 
@@ -99,22 +86,25 @@
     function appendMessage(role, text) {
       const div = document.createElement("div");
       div.className = role === "user" ? "userMsg" : "botMsg";
-      div.textContent = (role === "user" ? "User: " : "Bot: ") + text;
+      if (role === "user") {
+        div.textContent = "User: " + text;
+      } else {
+        // Use innerHTML so that any <think> elements are rendered with our CSS.
+        div.innerHTML = "Bot: " + text;
+      }
       chatArea.appendChild(div);
-      chatArea.scrollTop = chatArea.scrollHeight; // scroll to bottom
+      chatArea.scrollTop = chatArea.scrollHeight;
     }
 
     function updateBotMessage(text) {
-      // If the last message is from user, add a new bot message
       const lastChild = chatArea.lastElementChild;
       if (!lastChild || lastChild.className === "userMsg") {
         const div = document.createElement("div");
         div.className = "botMsg";
-        div.textContent = "Bot: " + text;
+        div.innerHTML = "Bot: " + text;
         chatArea.appendChild(div);
       } else {
-        // It's a botMsg, so update
-        lastChild.textContent = "Bot: " + text;
+        lastChild.innerHTML = "Bot: " + text;
       }
       chatArea.scrollTop = chatArea.scrollHeight;
     }
