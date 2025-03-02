@@ -10,37 +10,35 @@ import (
 )
 
 func main() {
-	// Read DB connection info from environment variables or hardcode as needed
-	host := os.Getenv("DB_HOST")         // e.g. "localhost"
-	port := os.Getenv("DB_PORT")         // e.g. "5432"
-	user := os.Getenv("DB_USER")         // e.g. "myuser"
-	password := os.Getenv("DB_PASSWORD") // e.g. "mypassword"
-	dbname := os.Getenv("DB_NAME")       // e.g. "mydb"
+	// Load database credentials
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
 
-	// Open the database
+	// Read the chat model from environment, defaulting if not set
+	chatModel := os.Getenv("CHAT_MODEL")
+	if chatModel == "" {
+		chatModel = "deepseek-r1:14b"
+	}
+
+	// Open the database connection
 	dbConn, err := db.OpenDB(host, port, user, password, dbname)
 	if err != nil {
 		log.Fatalf("Cannot open DB: %v\n", err)
 	}
 	defer dbConn.Close()
 
-	// Set up a quick ping
-	if err := dbConn.Ping(); err != nil {
-		log.Fatalf("Cannot ping DB: %v\n", err)
-	}
-	log.Println("Connected to Postgres successfully.")
+	// Set DB connection globally
+	db.SetDBConn(dbConn)
 
-	// Pass dbConn to the web package so handlers can use it
-	web.SetDBConn(dbConn)
+	// Set the chat model in the web package (so that SSE uses it)
+	web.SetChatModel(chatModel)
 
-	// Create a simple mux
+	// Register HTTP routes
 	mux := http.NewServeMux()
-
-	// Route for chat page (HTML)
-	mux.HandleFunc("/chat", web.ChatPage)
-
-	// SSE streaming endpoint
-	mux.HandleFunc("/chat/stream", web.ChatStream)
+	web.RegisterRoutes(mux)
 
 	// Start server
 	log.Println("Starting server on :4000...")

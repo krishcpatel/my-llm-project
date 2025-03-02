@@ -13,7 +13,9 @@
         "DB_PORT": "5432",
         "DB_USER": "user",
         "DB_PASSWORD": "password",
-        "DB_NAME": "mydb"
+        "DB_NAME": "mydb",
+        "CHAT_MODEL": "deepseek-r1:14b",
+        "EMBEDDING_MODEL": "deepseek-r1:7b",
       }
     }
   ]
