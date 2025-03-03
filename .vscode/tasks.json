@@ -4,7 +4,7 @@
         {
             "label": "Build Go App",
             "type": "shell",
-            "command": "go build -o my-llm-app.exe ./cmd/web",
+            "command": "go build -o my-llm-app.exe ./cmd/sever",
             "group": {
                 "kind": "build",
                 "isDefault": true

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi-Turn Chat with DB Memory</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <h1>Multi-Turn Chat with Memory</h1>
+  
+  <!-- Conversation Selector: Display current conversation and button to create a new one -->
+  <div id="conversationSelector" style="text-align: center; margin-bottom: 20px;">
+    <label for="conversationId">Conversation ID:</label>
+    <input type="number" id="conversationId" value="{{.ConversationID}}" />
+    <button id="loadConversationBtn">Load Conversation</button>
+    <button id="newConversationBtn">New Conversation</button>
+  </div>
+  
+  <!-- Chat area is scrollable -->
+  <div id="chatArea">
+    <!-- Render past messages if available -->
+    {{range .Messages}}
+      {{if eq .Role "user"}}
+        <div class="userMsg">User: {{.Content}}</div>
+      {{else}}
+        <div class="botMsg">Bot: {{.Content}}</div>
+      {{end}}
+    {{end}}
+  </div>
+  
+  <div style="margin-top: 20px; text-align: center;">
+    <input type="text" id="userInput" size="80" placeholder="Type your message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+  
+  <!-- Scroll-to-Bottom Button -->
+  <div style="text-align: center; margin-top: 10px;">
+    <button id="scrollBtn" class="scrollBtn">Scroll to Bottom</button>
+  </div>
+  
+  <script src="/static/chat.js"></script>
+</body>
+</html>

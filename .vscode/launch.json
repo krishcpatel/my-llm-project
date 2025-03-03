@@ -6,7 +6,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/web/main.go",
+      "program": "${workspaceFolder}/cmd/server/main.go",
       "cwd": "${workspaceFolder}",
       "env": {
         "DB_HOST": "localhost",
@@ -15,7 +15,7 @@
         "DB_PASSWORD": "password",
         "DB_NAME": "mydb",
         "CHAT_MODEL": "deepseek-r1:14b",
-        "EMBEDDING_MODEL": "deepseek-r1:7b",
+        "EMBEDDING_MODEL": "snowflake-arctic-embed2",
       }
     }
   ]
