@@ -105,11 +105,11 @@ A Go-based web application that integrates **Ollama** (local LLM inference) with
 5. Run the Application
    ### Build and run your application:
    ```bash
-   go run ./cmd/web
+   go run ./cmd/server
    ```
    ### Or build a binary:
    ```bash
-   go build -o my-llm-app ./cmd/web
+   go build -o my-llm-app ./cmd/server
    ./my-llm-app
    ```
    ### The server will start on http://localhost:4000.
