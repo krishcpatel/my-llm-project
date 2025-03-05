@@ -55,7 +55,7 @@ A Go-based web application that integrates **Ollama** (local LLM inference) with
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/<your-username>/my-llm-project.git
+   git clone https://github.com/krishcpatel/my-llm-project.git
    cd my-llm-project
    ```
 2. Install Dependencies
